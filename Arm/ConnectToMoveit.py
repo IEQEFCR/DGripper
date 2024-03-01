@@ -67,7 +67,7 @@ def update_joint_state():
 
     while 1:
         for i in range(6):
-            angle_to_send[i] = angle[i].value/180.0*np.pi
+            angle_to_send[i] = float(str(angle[i].value))*np.pi/180
             if i == 3 or i == 4:
                 angle_to_send[i] = -angle_to_send[i]
             angle_to_send[i] = round(angle_to_send[i], 4)
