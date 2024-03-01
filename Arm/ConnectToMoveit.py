@@ -64,14 +64,15 @@ def update_joint_state():
     angle_to_send = [0, 0, 0, 0, 0, 0]
     for i in range(6):
         angle[i] = plc.get_symbol("MAIN.Pos"+str(i+1), auto_update=True)
-        
+
     while 1:
-        print("i am child")
-        # for i in range(6):
-        #     angle_to_send[i] = angle[i].value
-        # publisher.publish(roslibpy.Message({'data': angle_to_send}))
+        for i in range(6):
+            angle_to_send[i] = angle[i].value/180.0*np.pi
+            if i == 3 or i == 4:
+                angle_to_send[i] = -angle_to_send[i]
+            angle_to_send[i] = round(angle_to_send[i], 4)
         publisher.publish(roslibpy.Message(
-            {'data': str(angle[0].value)+","+str(angle[1].value)+","+str(angle[2].value)+","+str(angle[3].value)+","+str(angle[4].value)+","+str(angle[5].value)}))
+            {'data': str(angle_to_send[0])+','+str(angle_to_send[1])+','+str(angle_to_send[2])+','+str(angle_to_send[3])+','+str(angle_to_send[4])+','+str(angle_to_send[5])}))
         time.sleep(0.1)
 
 
