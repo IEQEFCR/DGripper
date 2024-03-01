@@ -58,17 +58,19 @@ def update_joint_state():
     if os.getpid() == 0:
         return
     publisher = roslibpy.Topic(
-        client, '/arm_state', 'std_msgs/Float64MultiArray')
+        client, '/arm_state', 'std_msgs/String')
     publisher.advertise()
-    angle_to_send = [0,0,0,0,0,0]
+    # angle_to_send = [0, 0, 0, 0, 0, 0]
     for i in range(6):
         angle[i] = plc.get_symbol("MAIN.Pos"+str(i+1), auto_update=True)
 
     while 1:
         print("i am child")
-        for i in range(6):
-            angle_to_send[i] = angle[i].value
-        publisher.publish(roslibpy.Message({'data': angle_to_send}))
+        # for i in range(6):
+        #     angle_to_send[i] = angle[i].value
+        # publisher.publish(roslibpy.Message({'data': angle_to_send}))
+        publisher.publish(roslibpy.Message(
+            {'data': str(angle[0].value)+","+str(angle[1].value)+","+str(angle[2].value)+","+str(angle[3].value)+","+str(angle[4].value)+","+str(angle[5].value)}))
         time.sleep(0.1)
 
 
@@ -102,6 +104,7 @@ def receive_message():
             message_data[0] = None
         # listener.unsubscribe()
         # print(message)
+
 
 if __name__ == '__main__':
     client.run()
