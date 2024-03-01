@@ -1,0 +1,8 @@
+prefix=/home/kai/Arm_ws/devel
+
+Name: arm
+Description: Description of arm
+Version: 1.0.0
+Cflags: 
+Libs: -L${prefix}/lib 
+Requires: 

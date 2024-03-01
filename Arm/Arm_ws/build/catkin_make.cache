@@ -1,0 +1,2 @@
+arm:moveit_arm:remote_arm
+-DCATKIN_DEVEL_PREFIX=/home/kai/Arm_ws/devel -DCMAKE_INSTALL_PREFIX=/home/kai/Arm_ws/install -G Unix Makefiles
