@@ -1,6 +1,6 @@
 import numpy as np
 import cv2
-from shape_reconstruction import Camera
+from camera import Camera
 import yaml
 
 
@@ -60,9 +60,11 @@ class Sensor(Camera):
         return height_map
 
     def raw_image_2_representation(self, img_GRAY):
-        diff_darker = self.ref_GRAY.astype(np.float32) - img_GRAY.astype(np.float32)
+        diff_darker = self.ref_GRAY.astype(
+            np.float32) - img_GRAY.astype(np.float32)
         diff_darker[diff_darker < 0] = 0
-        diff_brighter = img_GRAY.astype(np.float32) - self.ref_GRAY.astype(np.float32)
+        diff_brighter = img_GRAY.astype(
+            np.float32) - self.ref_GRAY.astype(np.float32)
         diff_brighter[diff_brighter < 0] = 0
         scale = 3
         self.mixed_image[::, ::, 1] = diff_brighter * scale

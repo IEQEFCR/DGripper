@@ -1,6 +1,7 @@
 import cv2
 import yaml
-from shape_reconstruction import Sensor, Visualizer
+from sensor import Sensor
+from visualizer import Visualizer
 
 if __name__ == '__main__':
     f = open("shape_config.yaml", 'r+', encoding='utf-8')

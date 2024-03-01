@@ -19,12 +19,17 @@ class Camera:
         self.cap.set(cv2.CAP_PROP_FPS, fps)
 
         calibration_root_dir = cfg['calibration_root_dir']
-        self.calibration_sensor_dir = calibration_root_dir + '/sensor_' + str(sensor_id)
+        self.calibration_sensor_dir = calibration_root_dir + \
+            '/sensor_' + str(sensor_id)
         camera_calibration = cfg['camera_calibration']
-        self.camera_calibration_dir = self.calibration_sensor_dir + camera_calibration['camera_calibration_dir']
-        self.row_index_path = self.camera_calibration_dir + camera_calibration['row_index_path']
-        self.col_index_path = self.camera_calibration_dir + camera_calibration['col_index_path']
-        self.position_scale_path = self.camera_calibration_dir + camera_calibration['position_scale_path']
+        self.camera_calibration_dir = self.calibration_sensor_dir + \
+            camera_calibration['camera_calibration_dir']
+        self.row_index_path = self.camera_calibration_dir + \
+            camera_calibration['row_index_path']
+        self.col_index_path = self.camera_calibration_dir + \
+            camera_calibration['col_index_path']
+        self.position_scale_path = self.camera_calibration_dir + \
+            camera_calibration['position_scale_path']
 
         self.crop_img_height = camera_calibration['crop_size'][0]
         self.crop_img_width = camera_calibration['crop_size'][1]
@@ -35,9 +40,12 @@ class Camera:
             position_scale = np.load(self.position_scale_path)
             center_position = position_scale[0:2]
             self.pixel_per_mm = position_scale[2]
-            self.height_begin = int(center_position[0] - self.crop_img_height / 2)
-            self.height_end = int(center_position[0] + self.crop_img_height / 2)
-            self.width_begin = int(center_position[1] - self.crop_img_width / 2)
+            self.height_begin = int(
+                center_position[0] - self.crop_img_height / 2)
+            self.height_end = int(
+                center_position[0] + self.crop_img_height / 2)
+            self.width_begin = int(
+                center_position[1] - self.crop_img_width / 2)
             self.width_end = int(center_position[1] + self.crop_img_width / 2)
 
     def get_raw_image(self):
