@@ -57,13 +57,14 @@ def move():
 def update_joint_state():
     if os.getpid() == 0:
         return
+    client.run()
     publisher = roslibpy.Topic(
         client, '/arm_state', 'std_msgs/String')
     publisher.advertise()
-    # angle_to_send = [0, 0, 0, 0, 0, 0]
+    angle_to_send = [0, 0, 0, 0, 0, 0]
     for i in range(6):
         angle[i] = plc.get_symbol("MAIN.Pos"+str(i+1), auto_update=True)
-
+        
     while 1:
         print("i am child")
         # for i in range(6):
@@ -77,6 +78,7 @@ def update_joint_state():
 def receive_message():
     if os.getpid() == 1:
         return
+    client.run()
     listener = roslibpy.Topic(client, '/arm', 'std_msgs/Float64MultiArray')
     message_data = [None]
     while 1:
@@ -107,7 +109,6 @@ def receive_message():
 
 
 if __name__ == '__main__':
-    client.run()
     multiprocessing.Process(target=update_joint_state).start()
     receive_message()
     update_joint_state()
