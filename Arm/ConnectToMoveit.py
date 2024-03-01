@@ -8,7 +8,7 @@ from math import sin, cos
 plc = pyads.Connection('192.168.0.182.1.1', 851)
 plc.open()
 
-client = roslibpy.Ros(host='192.168.26.18', port=9090)
+client = roslibpy.Ros(host='192.168.137.40', port=9090)
 
 angle = [0, 0, 0, 0, 0, 0]
 last_angle = [0, 0, 0, 0, 0, 0]
@@ -56,9 +56,9 @@ def receive_message():
     listener = roslibpy.Topic(client, '/arm', 'std_msgs/Float64MultiArray')
     message_data = [None]
     for i in range(6):
-        angle[i] = plc.get_symbol("MAIN.Pos"+str(i+1))
+        angle[i] = plc.get_symbol("MAIN.Pos"+str(i+1),auto_update=True)
     while 1:
-        print(angle)
+        print(angle[0].value)
         listener.subscribe(
             lambda message: message_data.__setitem__(0, message['data']))
 
