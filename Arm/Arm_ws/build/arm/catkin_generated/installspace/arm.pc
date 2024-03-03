@@ -1,8 +1,0 @@
-prefix=/home/kai/DGripper/Arm/Arm_ws/install
-
-Name: arm
-Description: Description of arm
-Version: 1.0.0
-Cflags: 
-Libs: -L${prefix}/lib 
-Requires: 

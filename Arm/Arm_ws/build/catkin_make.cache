@@ -1,2 +1,0 @@
-arm:moveit_arm
--DCATKIN_DEVEL_PREFIX=/home/kai/DGripper/Arm/Arm_ws/devel -DCMAKE_INSTALL_PREFIX=/home/kai/DGripper/Arm/Arm_ws/install -G Unix Makefiles

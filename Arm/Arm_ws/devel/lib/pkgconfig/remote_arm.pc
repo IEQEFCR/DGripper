@@ -1,8 +1,0 @@
-prefix=/home/kai/Arm_ws/devel
-
-Name: remote_arm
-Description: Description of remote_arm
-Version: 0.0.0
-Cflags: 
-Libs: -L${prefix}/lib 
-Requires: 
