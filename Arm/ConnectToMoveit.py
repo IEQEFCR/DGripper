@@ -64,7 +64,7 @@ def update_joint_state():
     angle_to_send = [0, 0, 0, 0, 0, 0]
     for i in range(6):
         angle[i] = plc.get_symbol("MAIN.Pos"+str(i+1), auto_update=True)
-
+    time.sleep(0.1) 
     while 1:
         for i in range(6):
             angle_to_send[i] = float(str(angle[i].value))*np.pi/180
@@ -73,7 +73,7 @@ def update_joint_state():
             angle_to_send[i] = round(angle_to_send[i], 4)
         publisher.publish(roslibpy.Message(
             {'data': str(angle_to_send[0])+','+str(angle_to_send[1])+','+str(angle_to_send[2])+','+str(angle_to_send[3])+','+str(angle_to_send[4])+','+str(angle_to_send[5])}))
-        time.sleep(0.1)
+        # time.sleep(0.01)
 
 
 def receive_message():
@@ -103,7 +103,7 @@ def receive_message():
 
             print(index//6)
             plc.write_by_name("MAIN.pos_num", index//6)
-            # move()
+            move()
             message_data[0] = None
         # listener.unsubscribe()
         # print(message)
