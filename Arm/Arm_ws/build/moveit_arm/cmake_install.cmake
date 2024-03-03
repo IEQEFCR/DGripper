@@ -1,8 +1,8 @@
-# Install script for directory: /home/kai/Arm_ws/src/moveit_arm
+# Install script for directory: /home/kai/DGripper/Arm/Arm_ws/src/moveit_arm
 
 # Set the install prefix
 if(NOT DEFINED CMAKE_INSTALL_PREFIX)
-  set(CMAKE_INSTALL_PREFIX "/home/kai/Arm_ws/install")
+  set(CMAKE_INSTALL_PREFIX "/home/kai/DGripper/Arm/Arm_ws/install")
 endif()
 string(REGEX REPLACE "/$" "" CMAKE_INSTALL_PREFIX "${CMAKE_INSTALL_PREFIX}")
 
@@ -43,25 +43,25 @@ if(NOT DEFINED CMAKE_OBJDUMP)
 endif()
 
 if(CMAKE_INSTALL_COMPONENT STREQUAL "Unspecified" OR NOT CMAKE_INSTALL_COMPONENT)
-  file(INSTALL DESTINATION "${CMAKE_INSTALL_PREFIX}/lib/pkgconfig" TYPE FILE FILES "/home/kai/Arm_ws/build/moveit_arm/catkin_generated/installspace/moveit_arm.pc")
+  file(INSTALL DESTINATION "${CMAKE_INSTALL_PREFIX}/lib/pkgconfig" TYPE FILE FILES "/home/kai/DGripper/Arm/Arm_ws/build/moveit_arm/catkin_generated/installspace/moveit_arm.pc")
 endif()
 
 if(CMAKE_INSTALL_COMPONENT STREQUAL "Unspecified" OR NOT CMAKE_INSTALL_COMPONENT)
   file(INSTALL DESTINATION "${CMAKE_INSTALL_PREFIX}/share/moveit_arm/cmake" TYPE FILE FILES
-    "/home/kai/Arm_ws/build/moveit_arm/catkin_generated/installspace/moveit_armConfig.cmake"
-    "/home/kai/Arm_ws/build/moveit_arm/catkin_generated/installspace/moveit_armConfig-version.cmake"
+    "/home/kai/DGripper/Arm/Arm_ws/build/moveit_arm/catkin_generated/installspace/moveit_armConfig.cmake"
+    "/home/kai/DGripper/Arm/Arm_ws/build/moveit_arm/catkin_generated/installspace/moveit_armConfig-version.cmake"
     )
 endif()
 
 if(CMAKE_INSTALL_COMPONENT STREQUAL "Unspecified" OR NOT CMAKE_INSTALL_COMPONENT)
-  file(INSTALL DESTINATION "${CMAKE_INSTALL_PREFIX}/share/moveit_arm" TYPE FILE FILES "/home/kai/Arm_ws/src/moveit_arm/package.xml")
+  file(INSTALL DESTINATION "${CMAKE_INSTALL_PREFIX}/share/moveit_arm" TYPE FILE FILES "/home/kai/DGripper/Arm/Arm_ws/src/moveit_arm/package.xml")
 endif()
 
 if(CMAKE_INSTALL_COMPONENT STREQUAL "Unspecified" OR NOT CMAKE_INSTALL_COMPONENT)
-  file(INSTALL DESTINATION "${CMAKE_INSTALL_PREFIX}/share/moveit_arm" TYPE DIRECTORY FILES "/home/kai/Arm_ws/src/moveit_arm/launch" REGEX "/setup\\_assistant\\.launch$" EXCLUDE)
+  file(INSTALL DESTINATION "${CMAKE_INSTALL_PREFIX}/share/moveit_arm" TYPE DIRECTORY FILES "/home/kai/DGripper/Arm/Arm_ws/src/moveit_arm/launch" REGEX "/setup\\_assistant\\.launch$" EXCLUDE)
 endif()
 
 if(CMAKE_INSTALL_COMPONENT STREQUAL "Unspecified" OR NOT CMAKE_INSTALL_COMPONENT)
-  file(INSTALL DESTINATION "${CMAKE_INSTALL_PREFIX}/share/moveit_arm" TYPE DIRECTORY FILES "/home/kai/Arm_ws/src/moveit_arm/config")
+  file(INSTALL DESTINATION "${CMAKE_INSTALL_PREFIX}/share/moveit_arm" TYPE DIRECTORY FILES "/home/kai/DGripper/Arm/Arm_ws/src/moveit_arm/config")
 endif()
 

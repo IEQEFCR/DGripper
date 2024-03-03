@@ -57,10 +57,10 @@ RM = /home/kai/.local/lib/python3.8/site-packages/cmake/data/bin/cmake -E rm -f
 EQUALS = =
 
 # The top-level source directory on which CMake was run.
-CMAKE_SOURCE_DIR = /home/kai/Arm_ws/src
+CMAKE_SOURCE_DIR = /home/kai/DGripper/Arm/Arm_ws/src
 
 # The top-level build directory on which CMake was run.
-CMAKE_BINARY_DIR = /home/kai/Arm_ws/build
+CMAKE_BINARY_DIR = /home/kai/DGripper/Arm/Arm_ws/build
 
 #=============================================================================
 # Targets provided globally by CMake.
@@ -142,14 +142,14 @@ install/strip/fast: preinstall/fast
 
 # The main all target
 all: cmake_check_build_system
-	cd /home/kai/Arm_ws/build && $(CMAKE_COMMAND) -E cmake_progress_start /home/kai/Arm_ws/build/CMakeFiles /home/kai/Arm_ws/build/moveit_arm//CMakeFiles/progress.marks
-	cd /home/kai/Arm_ws/build && $(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 moveit_arm/all
-	$(CMAKE_COMMAND) -E cmake_progress_start /home/kai/Arm_ws/build/CMakeFiles 0
+	cd /home/kai/DGripper/Arm/Arm_ws/build && $(CMAKE_COMMAND) -E cmake_progress_start /home/kai/DGripper/Arm/Arm_ws/build/CMakeFiles /home/kai/DGripper/Arm/Arm_ws/build/moveit_arm//CMakeFiles/progress.marks
+	cd /home/kai/DGripper/Arm/Arm_ws/build && $(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 moveit_arm/all
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/kai/DGripper/Arm/Arm_ws/build/CMakeFiles 0
 .PHONY : all
 
 # The main clean target
 clean:
-	cd /home/kai/Arm_ws/build && $(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 moveit_arm/clean
+	cd /home/kai/DGripper/Arm/Arm_ws/build && $(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 moveit_arm/clean
 .PHONY : clean
 
 # The main clean target
@@ -158,22 +158,22 @@ clean/fast: clean
 
 # Prepare targets for installation.
 preinstall: all
-	cd /home/kai/Arm_ws/build && $(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 moveit_arm/preinstall
+	cd /home/kai/DGripper/Arm/Arm_ws/build && $(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 moveit_arm/preinstall
 .PHONY : preinstall
 
 # Prepare targets for installation.
 preinstall/fast:
-	cd /home/kai/Arm_ws/build && $(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 moveit_arm/preinstall
+	cd /home/kai/DGripper/Arm/Arm_ws/build && $(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 moveit_arm/preinstall
 .PHONY : preinstall/fast
 
 # clear depends
 depend:
-	cd /home/kai/Arm_ws/build && $(CMAKE_COMMAND) -S$(CMAKE_SOURCE_DIR) -B$(CMAKE_BINARY_DIR) --check-build-system CMakeFiles/Makefile.cmake 1
+	cd /home/kai/DGripper/Arm/Arm_ws/build && $(CMAKE_COMMAND) -S$(CMAKE_SOURCE_DIR) -B$(CMAKE_BINARY_DIR) --check-build-system CMakeFiles/Makefile.cmake 1
 .PHONY : depend
 
 # Convenience name for target.
 moveit_arm/CMakeFiles/_catkin_empty_exported_target.dir/rule:
-	cd /home/kai/Arm_ws/build && $(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 moveit_arm/CMakeFiles/_catkin_empty_exported_target.dir/rule
+	cd /home/kai/DGripper/Arm/Arm_ws/build && $(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 moveit_arm/CMakeFiles/_catkin_empty_exported_target.dir/rule
 .PHONY : moveit_arm/CMakeFiles/_catkin_empty_exported_target.dir/rule
 
 # Convenience name for target.
@@ -182,7 +182,7 @@ _catkin_empty_exported_target: moveit_arm/CMakeFiles/_catkin_empty_exported_targ
 
 # fast build rule for target.
 _catkin_empty_exported_target/fast:
-	cd /home/kai/Arm_ws/build && $(MAKE) $(MAKESILENT) -f moveit_arm/CMakeFiles/_catkin_empty_exported_target.dir/build.make moveit_arm/CMakeFiles/_catkin_empty_exported_target.dir/build
+	cd /home/kai/DGripper/Arm/Arm_ws/build && $(MAKE) $(MAKESILENT) -f moveit_arm/CMakeFiles/_catkin_empty_exported_target.dir/build.make moveit_arm/CMakeFiles/_catkin_empty_exported_target.dir/build
 .PHONY : _catkin_empty_exported_target/fast
 
 # Help Target
@@ -210,6 +210,6 @@ help:
 # No rule that depends on this can have commands that come from listfiles
 # because they might be regenerated.
 cmake_check_build_system:
-	cd /home/kai/Arm_ws/build && $(CMAKE_COMMAND) -S$(CMAKE_SOURCE_DIR) -B$(CMAKE_BINARY_DIR) --check-build-system CMakeFiles/Makefile.cmake 0
+	cd /home/kai/DGripper/Arm/Arm_ws/build && $(CMAKE_COMMAND) -S$(CMAKE_SOURCE_DIR) -B$(CMAKE_BINARY_DIR) --check-build-system CMakeFiles/Makefile.cmake 0
 .PHONY : cmake_check_build_system
 

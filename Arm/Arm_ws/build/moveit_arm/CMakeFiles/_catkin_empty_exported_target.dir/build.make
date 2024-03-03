@@ -53,10 +53,10 @@ RM = /home/kai/.local/lib/python3.8/site-packages/cmake/data/bin/cmake -E rm -f
 EQUALS = =
 
 # The top-level source directory on which CMake was run.
-CMAKE_SOURCE_DIR = /home/kai/Arm_ws/src
+CMAKE_SOURCE_DIR = /home/kai/DGripper/Arm/Arm_ws/src
 
 # The top-level build directory on which CMake was run.
-CMAKE_BINARY_DIR = /home/kai/Arm_ws/build
+CMAKE_BINARY_DIR = /home/kai/DGripper/Arm/Arm_ws/build
 
 # Utility rule file for _catkin_empty_exported_target.
 
@@ -74,10 +74,10 @@ moveit_arm/CMakeFiles/_catkin_empty_exported_target.dir/build: _catkin_empty_exp
 .PHONY : moveit_arm/CMakeFiles/_catkin_empty_exported_target.dir/build
 
 moveit_arm/CMakeFiles/_catkin_empty_exported_target.dir/clean:
-	cd /home/kai/Arm_ws/build/moveit_arm && $(CMAKE_COMMAND) -P CMakeFiles/_catkin_empty_exported_target.dir/cmake_clean.cmake
+	cd /home/kai/DGripper/Arm/Arm_ws/build/moveit_arm && $(CMAKE_COMMAND) -P CMakeFiles/_catkin_empty_exported_target.dir/cmake_clean.cmake
 .PHONY : moveit_arm/CMakeFiles/_catkin_empty_exported_target.dir/clean
 
 moveit_arm/CMakeFiles/_catkin_empty_exported_target.dir/depend:
-	cd /home/kai/Arm_ws/build && $(CMAKE_COMMAND) -E cmake_depends "Unix Makefiles" /home/kai/Arm_ws/src /home/kai/Arm_ws/src/moveit_arm /home/kai/Arm_ws/build /home/kai/Arm_ws/build/moveit_arm /home/kai/Arm_ws/build/moveit_arm/CMakeFiles/_catkin_empty_exported_target.dir/DependInfo.cmake --color=$(COLOR)
+	cd /home/kai/DGripper/Arm/Arm_ws/build && $(CMAKE_COMMAND) -E cmake_depends "Unix Makefiles" /home/kai/DGripper/Arm/Arm_ws/src /home/kai/DGripper/Arm/Arm_ws/src/moveit_arm /home/kai/DGripper/Arm/Arm_ws/build /home/kai/DGripper/Arm/Arm_ws/build/moveit_arm /home/kai/DGripper/Arm/Arm_ws/build/moveit_arm/CMakeFiles/_catkin_empty_exported_target.dir/DependInfo.cmake --color=$(COLOR)
 .PHONY : moveit_arm/CMakeFiles/_catkin_empty_exported_target.dir/depend
 

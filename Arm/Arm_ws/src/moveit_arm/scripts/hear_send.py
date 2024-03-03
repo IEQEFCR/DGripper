@@ -35,12 +35,6 @@ def arm_state_callback(data):
     arm_state_msg.header.stamp = rospy.Time.now()
     arm_state_pub.publish(arm_state_msg)
 
-
-def get_plan():
-    sub = rospy.Subscriber('/move_group/display_planned_path', DisplayTrajectory, callback)
-    arm_state = rospy.Subscriber('/arm_state', String, arm_state_callback)
-    rospy.spin()
-
 if __name__ == "__main__":
     rospy.init_node('hear_send')
     launch_time = rospy.Time.now()
@@ -48,5 +42,7 @@ if __name__ == "__main__":
     arm_state_pub = rospy.Publisher('/move_group/fake_controller_joint_states', JointState, queue_size=10)
     msg = Float64MultiArray()
     arm_state_msg = JointState()
-    rospy.Rate(5)
-    get_plan()
+    rospy.Rate(20)
+    sub = rospy.Subscriber('/move_group/display_planned_path', DisplayTrajectory, callback)
+    arm_state = rospy.Subscriber('/arm_state', String, arm_state_callback)
+    rospy.spin()

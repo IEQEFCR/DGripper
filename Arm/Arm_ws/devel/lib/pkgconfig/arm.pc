@@ -1,4 +1,4 @@
-prefix=/home/kai/Arm_ws/devel
+prefix=/home/kai/DGripper/Arm/Arm_ws/devel
 
 Name: arm
 Description: Description of arm

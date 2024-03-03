@@ -1,4 +1,4 @@
-prefix=/home/kai/Arm_ws/install
+prefix=/home/kai/DGripper/Arm/Arm_ws/install
 
 Name: arm
 Description: Description of arm
