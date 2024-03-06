@@ -10,7 +10,6 @@ import os
 
 device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 
-
 def generate_random_dataset(dataset_path):
     train_img = []
     train_label = []
@@ -19,10 +18,10 @@ def generate_random_dataset(dataset_path):
         # resize img to 256*256
         img = img.astype(np.uint8)
         img = cv2.resize(img, (256, 256))
-        cv2.imshow("img", img)
-        cv2.imwrite(dataset_path + '/' + str(i) + '.jpg', img)
+        # cv2.imshow("img", img)
+        cv2.imwrite( 'dataset/'+str(i) + '.jpg', img)
         print(dataset_path + '/' + str(i) + '.jpg')
-        cv2.waitKey(0)
+        # cv2.waitKey(0)
         # img 2 tensor
         train_img.append(img)
         train_label.append(np.random.randn(3))
@@ -65,6 +64,8 @@ class CustomDataset(Dataset):  # 输入为图片路径和标签
 
 def load_dataset():
     os.chdir(os.path.dirname(os.path.abspath(__file__)))
+    #print now path
+
     config = pyaml.yaml.load(open('./config.yaml'),
                              Loader=pyaml.yaml.SafeLoader)
     dataset_path = config['dataset_path']
@@ -75,8 +76,9 @@ def load_dataset():
             max_folder = int(folder)
     max_folder += 1
     print(max_folder)
+    #mkdir dataset_path + '/' + str(max_folder)
+    
     generate_random_dataset(dataset_path + '/' + str(max_folder))
-
 
 if __name__ == '__main__':
     load_dataset()
