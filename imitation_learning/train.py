@@ -5,11 +5,13 @@ from torch.utils.data import Dataset, DataLoader
 from torchvision import transforms
 from PIL import Image
 import cv2
+import pyaml
+import os
 
 device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 
 
-def generate_random_dataset():
+def generate_random_dataset(dataset_path):
     train_img = []
     train_label = []
     for i in range(10):
@@ -18,6 +20,8 @@ def generate_random_dataset():
         img = img.astype(np.uint8)
         img = cv2.resize(img, (256, 256))
         cv2.imshow("img", img)
+        cv2.imwrite(dataset_path + '/' + str(i) + '.jpg', img)
+        print(dataset_path + '/' + str(i) + '.jpg')
         cv2.waitKey(0)
         # img 2 tensor
         train_img.append(img)
@@ -59,9 +63,25 @@ class CustomDataset(Dataset):  # 输入为图片路径和标签
         return self.data_len
 
 
-if __name__ == '__main__':
+def load_dataset():
+    os.chdir(os.path.dirname(os.path.abspath(__file__)))
+    config = pyaml.yaml.load(open('./config.yaml'),
+                             Loader=pyaml.yaml.SafeLoader)
+    dataset_path = config['dataset_path']
+    # 找到数据集路径中最大的文件夹
+    max_folder = -1
+    for folder in os.listdir(dataset_path):
+        if int(folder) > max_folder:
+            max_folder = int(folder)
+    max_folder += 1
+    print(max_folder)
+    generate_random_dataset(dataset_path + '/' + str(max_folder))
 
-    img, label = generate_random_dataset()
+
+if __name__ == '__main__':
+    load_dataset()
+    exit(0)
+    # img, label =
     # 数据集路径
     data_path = "/path/to/your/dataset"
     # 假设有一个包含图像文件和标签的数据集，可以使用transforms进行图像预处理

@@ -26,8 +26,8 @@ def Densenet(layer=169, pretrained=True):
         model = models.densenet121(pretrained=pretrained)
         print('use Densenet-121')
     elif layer == 161:
-        print('use Densenet-161')
         model = models.densenet161(pretrained=pretrained)
+        print('use Densenet-161')
     elif layer == 169:
         model = models.densenet169(pretrained=pretrained)
         print('use Densenet-169')
