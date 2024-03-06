@@ -11,6 +11,7 @@ from tqdm import tqdm
 
 device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 
+
 def generate_random_dataset(dataset_path):
 
     max_folder = -1
@@ -25,11 +26,14 @@ def generate_random_dataset(dataset_path):
         c1 = np.random.randint(0, 255, size=(480, 640, 1))
         c2 = np.random.randint(0, 255, size=(480, 640, 1))
         c3 = np.random.randint(0, 255, size=(480, 640, 1))
-        img = np.concatenate((c1, c2, c3), axis=2) # 480x640x3
+        img = np.concatenate((c1, c2, c3), axis=2)  # 480x640x3
         label = np.random.randn(3)
         label = np.round(label, 3)
-        label_name = str(i)+'_'+str(label[0]) + '_' + str(label[1]) + '_' + str(label[2]) + '.jpg'
-        cv2.imwrite(os.path.join(dataset_path, str(max_folder), label_name), img)
+        label_name = str(i)+'_'+str(label[0]) + '_' + \
+            str(label[1]) + '_' + str(label[2]) + '.jpg'
+        cv2.imwrite(os.path.join(
+            dataset_path, str(max_folder), label_name), img)
+
 
 class CustomDataset(Dataset):  # 输入为图片路径和标签
     def __init__(self, dataset_path, transform=None):
@@ -38,12 +42,13 @@ class CustomDataset(Dataset):  # 输入为图片路径和标签
         self.imgs = []
         self.labels = []
         for folder in os.listdir(dataset_path):
-            #open the folder, get the image
+            # open the folder, get the image
             for file in os.listdir(os.path.join(dataset_path, folder)):
                 img = Image.open(os.path.join(dataset_path, folder, file))
-                label = file.split('_')   #name structure: index_roll1_roll2_grip.jpg
-                label = label[1:4]          #roll1, roll2, grip
-                label[2] = label[2][:-4]    #remove.jpg
+                # name structure: index_roll1_roll2_grip.jpg
+                label = file.split('_')
+                label = label[1:4]  # roll1, roll2, grip
+                label[2] = label[2][:-4]  # remove.jpg
                 label = [float(i) for i in label]
                 # print(label)
                 self.imgs.append(img)
@@ -62,7 +67,6 @@ class CustomDataset(Dataset):  # 输入为图片路径和标签
         return self.data_len
 
 
-
 def load_dataset():
     os.chdir(os.path.dirname(os.path.abspath(__file__)))
     config = pyaml.yaml.load(open('./config.yaml'),
@@ -76,18 +80,19 @@ def load_dataset():
     custom_dataset = CustomDataset(dataset_path, transform=transform)
     return custom_dataset
 
+
 def train(dataset):
-    batch_size = 2
+    batch_size = 5
     data_loader = DataLoader(
         dataset, batch_size=batch_size, shuffle=True)
-    model = cnn.Densenet(layer=121, pretrained=True).to(device)
+    model = cnn.Densenet(layer=169, pretrained=True).to(device)
     optimizer = torch.optim.Adam(model.parameters(), lr=0.001)
     for epoch in range(50):
         print("Epoch:", epoch)
         for image, label in data_loader:
             model.train()
             optimizer.zero_grad()
-            image , label = image.to(device), label.to(device)
+            image, label = image.to(device), label.to(device)
             outputs = model(image)
             criterion = torch.nn.MSELoss()
             # 计算损失
@@ -97,11 +102,12 @@ def train(dataset):
             optimizer.step()
             print(loss.item())
 
-    #save model
+    # save model
     torch.save(model, 'model.pth')
 
+
 def evaluate(model, dataset):
-    batch_size = 1
+    batch_size = 2
     data_loader = DataLoader(
         dataset, batch_size=batch_size, shuffle=True)
     for image, label in data_loader:
@@ -112,8 +118,9 @@ def evaluate(model, dataset):
         print(torch.mean(torch.abs(outputs - label)))
         print("")
 
+
 if __name__ == '__main__':
     dataset = load_dataset()
-    # model = torch.load('model.pth')
-    # evaluate(model, dataset)
-    train(dataset)
+    model = torch.load('model.pth')
+    evaluate(model, dataset)
+    # train(dataset)
