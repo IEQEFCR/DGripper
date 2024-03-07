@@ -1,3 +1,4 @@
+#!/usr/bin/env python3
 import cnn
 import torch
 import numpy as np
@@ -13,7 +14,6 @@ device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 
 
 def generate_random_dataset(dataset_path):
-
     max_folder = -1
     for folder in os.listdir(dataset_path):
         if int(folder) > max_folder:
