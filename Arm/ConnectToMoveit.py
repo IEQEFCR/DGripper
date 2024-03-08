@@ -87,7 +87,7 @@ def update_joint_state():
         time.sleep(0.01)
 
 
-def receive_message():
+def receive_message(mode='pos'):
     # buffer_num = plc.read_by_name("MAIN.fifo_running")
     if os.getpid() == 1:
         return
@@ -101,44 +101,27 @@ def receive_message():
 
         if message_data[0] is not None:
             print(message_data[0])
-            index = 0
-            for i in message_data[0]:
-                if index % 6 == 4 or index % 6 == 3:
-                    plc.write_by_name(
-                        "MAIN.Pos_arr2["+str(index//6)+","+str(index % 6+1)+"]", -i)
-                else:
-                    plc.write_by_name(
-                        "MAIN.Pos_arr2["+str(index//6)+","+str(index % 6+1)+"]", i)
-                # last_angle[index%6] = i
-                index = index + 1
-            plc.write_by_name("MAIN.pos_num", index//6)
-            fifo_start_move()
-            #     if(index == 36):
-            #         buffer_num = plc.read_by_name("MAIN.fifo_running")
-            #         if(str(buffer_num)=='0'):
-            #             plc.write_by_name("MAIN.pos_num", index//6)
-            #             fifo_start_move()
-            #         else:
-            #             plc.write_by_name("MAIN.pos_num", index//6)
-            #             fifo_continue_move()
-            #         index = 0
-            # while(buffer_num == '1') :
-            #     buffer_num = plc.read_by_name("MAIN.fifo_running")
-            
-            # for i in range(6):
-            #     if i==4 or i==3 :
-            #         plc.write_by_name("MAIN.SetPos["+str(i+1)+"]",-1.0*last_angle[i])
-            #     else :
-            #         plc.write_by_name("MAIN.SetPos["+str(i+1)+"]",last_angle[i])
-            # if index!=0 :   
-            #     pos_move()
+            if (mode =='fifo'):
+                print('fifo mode')
+                index = 0
+                for i in message_data[0]:
+                    if index % 6 == 4 or index % 6 == 3:
+                        plc.write_by_name(
+                            "MAIN.Pos_arr2["+str(index//6)+","+str(index % 6+1)+"]", -i)
+                    else:
+                        plc.write_by_name(
+                            "MAIN.Pos_arr2["+str(index//6)+","+str(index % 6+1)+"]", i)
+                    index = index + 1
+                plc.write_by_name("MAIN.pos_num", index//6)
+                fifo_start_move()
+            else :
+                print('pos mode')
+                last_angle = message_data[-6:] #倒数6个
+                print(last_angle)
             
             message_data[0] = None
-        # listener.unsubscribe()
-        # print(message)
-
 
 if __name__ == '__main__':
     multiprocessing.Process(target=update_joint_state).start()
-    receive_message()
+    receive_message('pos')
     update_joint_state()
