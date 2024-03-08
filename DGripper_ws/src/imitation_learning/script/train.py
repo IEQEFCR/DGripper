@@ -11,7 +11,7 @@ import os
 from tqdm import tqdm
 
 device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
-
+model_path = './model'
 
 def generate_random_dataset(dataset_path):
     max_folder = -1
@@ -82,14 +82,27 @@ def load_dataset():
 
 
 def train(dataset):
-    batch_size = 5
+    batch_size = 1
     data_loader = DataLoader(
         dataset, batch_size=batch_size, shuffle=True)
     model = cnn.Densenet(layer=169, pretrained=True).to(device)
     optimizer = torch.optim.Adam(model.parameters(), lr=0.001)
     for epoch in range(50):
         print("Epoch:", epoch)
-        for image, label in data_loader:
+        # for image, label in data_loader:
+        #     model.train()
+        #     optimizer.zero_grad()
+        #     image, label = image.to(device), label.to(device)
+        #     outputs = model(image)
+        #     criterion = torch.nn.MSELoss()
+        #     # 计算损失
+        #     loss = criterion(outputs.double(), label.to(device).double())
+        #     # 反向传播,adam优化
+        #     loss.backward()
+        #     optimizer.step()
+        #     print(loss.item())
+
+        for image, label in tqdm(data_loader):
             model.train()
             optimizer.zero_grad()
             image, label = image.to(device), label.to(device)
@@ -103,11 +116,14 @@ def train(dataset):
             print(loss.item())
 
     # save model
-    torch.save(model, 'model.pth')
+    os.chdir(os.path.dirname(os.path.abspath(__file__)))
+    if not os.path.exists(model_path):
+        os.makedirs(model_path)
+    torch.save(model, os.path.join(model_path, 'model_'+str(len(os.listdir(model_path)))+'.pth'))
 
 
 def evaluate(model, dataset):
-    batch_size = 2
+    batch_size = 1
     data_loader = DataLoader(
         dataset, batch_size=batch_size, shuffle=True)
     for image, label in data_loader:
@@ -118,9 +134,20 @@ def evaluate(model, dataset):
         print(torch.mean(torch.abs(outputs - label)))
         print("")
 
+def chose_model():
+    os.chdir(os.path.dirname(__file__))
+    index = 0
+    model_list = []
+    for model in os.listdir(model_path):
+        print('['+str(index)+'] ', model)
+        model_list.append(model)
+        index += 1
+    model_index = int(input('Choose a model: '))
+    model=torch.load(os.path.join(model_path, model_list[model_index]))
+    return model
 
 if __name__ == '__main__':
     dataset = load_dataset()
-    model = torch.load('model.pth')
+    model = chose_model()
     evaluate(model, dataset)
     # train(dataset)
