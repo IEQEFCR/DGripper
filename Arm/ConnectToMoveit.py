@@ -103,7 +103,7 @@ def receive_message(mode='pos'):
             lambda message: message_data.__setitem__(0, message['data']))
 
         if message_data[0] is not None:
-            print(message_data[0])
+            # print(message_data[0])
             if (mode =='fifo'):
                 print('fifo mode')
                 index = 0
@@ -120,6 +120,11 @@ def receive_message(mode='pos'):
             else :
                 print('pos mode')
                 last_angle = message_data[0][-6:] #倒数6个
+                last_angle[4] = -last_angle[4]
+                last_angle[3] = -last_angle[3]
+                for i in range(6):
+                    plc.write_by_name("MAIN.SetPos["+str(i+1)+"]", last_angle[i])
+                pos_move()
                 print(last_angle)
             
             message_data[0] = None
