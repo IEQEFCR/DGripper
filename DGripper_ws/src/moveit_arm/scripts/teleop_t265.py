@@ -90,31 +90,38 @@ class MoveItIkDemo:
         now_pose.pose.orientation.z = 0.707
         now_pose.pose.orientation.w = 0
         last_time = rospy.get_time()
+        single_step = 0.01
         while rospy.is_shutdown()==False:
-
             key = getch()
             if key == 'w':
-                now_pose.pose.position.x += 0.01
+                now_pose.pose.position.x += single_step
                 way_points.append(now_pose.pose)
             elif key == 's':
-                now_pose.pose.position.x -= 0.01
+                now_pose.pose.position.x -= single_step
                 way_points.append(now_pose.pose)
             elif key == 'a':
-                now_pose.pose.position.y += 0.01
+                now_pose.pose.position.y += single_step
                 way_points.append(now_pose.pose)
             elif key == 'd':
-                now_pose.pose.position.y -= 0.01
+                now_pose.pose.position.y -= single_step
                 way_points.append(now_pose.pose)
             elif key == ' ':
-                now_pose.pose.position.z += 0.01
+                now_pose.pose.position.z += single_step
                 way_points.append(now_pose.pose)
             #elif key is shift:
             elif key == 'c':
-                now_pose.pose.position.z -= 0.01
+                now_pose.pose.position.z -= single_step
                 way_points.append(now_pose.pose)
+            elif key =='u':
+                single_step*=2
+            elif key =='j':
+                single_step/=2
+                
+            print(single_step)
+            
             rate.sleep()
 
-            if rospy.get_time()-last_time>0.07:
+            if rospy.get_time()-last_time>0.5:
                 (plan, fraction) = arm.compute_cartesian_path(
                     way_points,   # waypoints to follow
                     0.002,        # eef_step

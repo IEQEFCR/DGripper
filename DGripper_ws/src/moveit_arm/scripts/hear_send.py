@@ -32,6 +32,7 @@ def arm_state_callback(data):
     arm_state_msg.position = [float(i) for i in angle_list]
     arm_state_msg.velocity = [0,0,0,0,0,0]
     arm_state_msg.effort = [0,0,0,0,0,0]
+    arm_state_msg.name = ['joint1', 'joint2', 'joint3', 'joint4', 'joint5', 'joint6']
     arm_state_msg.header.stamp = rospy.Time.now()
     arm_state_pub.publish(arm_state_msg)
 

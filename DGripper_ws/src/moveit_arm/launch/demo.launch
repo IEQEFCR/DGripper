@@ -1,4 +1,6 @@
 <launch>
+<!--launch rosbridge_socket-->
+<node name="rosbridge_websocket" pkg="rosbridge_server" type="rosbridge_websocket" output="screen"/>
 
   <!-- specify the planning pipeline -->
   <arg name="pipeline" default="ompl" />
