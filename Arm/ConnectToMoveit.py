@@ -10,7 +10,7 @@ import os
 plc = pyads.Connection('192.168.0.182.1.1', 851)
 plc.open()
 
-client = roslibpy.Ros(host='192.168.137.40', port=9090)
+client = roslibpy.Ros(host='192.168.26.18', port=9090)
 
 angle = [0, 0, 0, 0, 0, 0]
 last_angle = [0, 0, 0, 0, 0, 0]
@@ -46,12 +46,22 @@ def click(var_name):
     plc.write_by_name(var_name, trigger)
 
 
-def move():
+def fifo_start_move():
     click("FiFo_SetChannelOverride.bExecute")
     click("FiFo_GroupDisintegrate.bExecute")
     click("integrate_do")
     click("FIFO_write_do")
     click("start_do")
+
+def fifo_continue_move():
+    # click("FiFo_SetChannelOverride.bExecute")
+    click("FIFO_write_do")
+
+def pos_move():
+    click("stop_do")
+    click("FiFo_GroupDisintegrate.bExecute")
+    plc.write_by_name("MAIN.SetPosVel",5.0)
+    click("is_SetPos")
 
 
 def update_joint_state():
@@ -71,12 +81,14 @@ def update_joint_state():
             if i == 3 or i == 4:
                 angle_to_send[i] = -angle_to_send[i]
             angle_to_send[i] = round(angle_to_send[i], 4)
+        print(angle_to_send)
         publisher.publish(roslibpy.Message(
             {'data': str(angle_to_send[0])+','+str(angle_to_send[1])+','+str(angle_to_send[2])+','+str(angle_to_send[3])+','+str(angle_to_send[4])+','+str(angle_to_send[5])}))
-        # time.sleep(0.01)
+        time.sleep(0.01)
 
 
 def receive_message():
+    # buffer_num = plc.read_by_name("MAIN.fifo_running")
     if os.getpid() == 1:
         return
     client.run()
@@ -97,13 +109,30 @@ def receive_message():
                 else:
                     plc.write_by_name(
                         "MAIN.Pos_arr2["+str(index//6)+","+str(index % 6+1)+"]", i)
+                # last_angle[index%6] = i
                 index = index + 1
-
-            last_angle = message_data[0][-6:]
-
-            print(index//6)
             plc.write_by_name("MAIN.pos_num", index//6)
-            move()
+            fifo_start_move()
+            #     if(index == 36):
+            #         buffer_num = plc.read_by_name("MAIN.fifo_running")
+            #         if(str(buffer_num)=='0'):
+            #             plc.write_by_name("MAIN.pos_num", index//6)
+            #             fifo_start_move()
+            #         else:
+            #             plc.write_by_name("MAIN.pos_num", index//6)
+            #             fifo_continue_move()
+            #         index = 0
+            # while(buffer_num == '1') :
+            #     buffer_num = plc.read_by_name("MAIN.fifo_running")
+            
+            # for i in range(6):
+            #     if i==4 or i==3 :
+            #         plc.write_by_name("MAIN.SetPos["+str(i+1)+"]",-1.0*last_angle[i])
+            #     else :
+            #         plc.write_by_name("MAIN.SetPos["+str(i+1)+"]",last_angle[i])
+            # if index!=0 :   
+            #     pos_move()
+            
             message_data[0] = None
         # listener.unsubscribe()
         # print(message)
