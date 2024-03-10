@@ -61,9 +61,9 @@ def fifo_continue_move():
     click("FIFO_write_do")
 
 def pos_move():
-    click("stop_do")
-    click("FiFo_GroupDisintegrate.bExecute")
-    plc.write_by_name("MAIN.SetPosVel",5.0)
+    # click("stop_do")
+    # click("FiFo_GroupDisintegrate.bExecute")
+    plc.write_by_name("MAIN.SetPosVel",8.0)
     click("is_SetPos")
 
 
