@@ -20,6 +20,8 @@ def callback(data):
                 temp [5] = 0
                 angle_list = np.append(angle_list,temp)
                 # angle_list[-1][-1] = 0
+
+            
             angle_list*=180/np.pi
             msg.data = angle_list
             pub.publish(msg)

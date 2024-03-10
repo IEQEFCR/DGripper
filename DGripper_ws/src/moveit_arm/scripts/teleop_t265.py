@@ -93,16 +93,18 @@ class MoveItIkDemo:
         single_step = 0.01
         while rospy.is_shutdown()==False:
             key = getch()
-            if key == 'w':
+            if key =='q':
+                break
+            if key == 's':
                 now_pose.pose.position.x += single_step
                 way_points.append(now_pose.pose)
-            elif key == 's':
+            elif key == 'w':
                 now_pose.pose.position.x -= single_step
                 way_points.append(now_pose.pose)
-            elif key == 'a':
+            elif key == 'd':
                 now_pose.pose.position.y += single_step
                 way_points.append(now_pose.pose)
-            elif key == 'd':
+            elif key == 'a':
                 now_pose.pose.position.y -= single_step
                 way_points.append(now_pose.pose)
             elif key == ' ':

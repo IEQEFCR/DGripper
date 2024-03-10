@@ -67,6 +67,7 @@
   </include>
 
   <!-- rosrun remote_arm hear_send.py -->
-  <node name="hear_send" pkg="remote_arm" type="hear_send.py" output="screen" />
+<node name="hear_send" pkg="moveit_arm" type="hear_send.py" output="screen" />
+
 
 </launch>
