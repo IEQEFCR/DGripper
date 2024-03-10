@@ -10,7 +10,10 @@ import os
 plc = pyads.Connection('192.168.0.182.1.1', 851)
 plc.open()
 
-client = roslibpy.Ros(host='192.168.26.18', port=9090)
+KAI = '192.168.137.40'
+LEI = '192.168.26.18'
+
+client = roslibpy.Ros(host=KAI, port=9090)
 
 angle = [0, 0, 0, 0, 0, 0]
 last_angle = [0, 0, 0, 0, 0, 0]
@@ -58,9 +61,9 @@ def fifo_continue_move():
     click("FIFO_write_do")
 
 def pos_move():
-    click("stop_do")
-    click("FiFo_GroupDisintegrate.bExecute")
-    plc.write_by_name("MAIN.SetPosVel",5.0)
+    # click("stop_do")
+    # click("FiFo_GroupDisintegrate.bExecute")
+    plc.write_by_name("MAIN.SetPosVel",8.0)
     click("is_SetPos")
 
 
@@ -81,7 +84,7 @@ def update_joint_state():
             if i == 3 or i == 4:
                 angle_to_send[i] = -angle_to_send[i]
             angle_to_send[i] = round(angle_to_send[i], 4)
-        print(angle_to_send)
+        # print(angle_to_send)
         publisher.publish(roslibpy.Message(
             {'data': str(angle_to_send[0])+','+str(angle_to_send[1])+','+str(angle_to_send[2])+','+str(angle_to_send[3])+','+str(angle_to_send[4])+','+str(angle_to_send[5])}))
         time.sleep(0.01)
@@ -100,7 +103,7 @@ def receive_message(mode='pos'):
             lambda message: message_data.__setitem__(0, message['data']))
 
         if message_data[0] is not None:
-            print(message_data[0])
+            # print(message_data[0])
             if (mode =='fifo'):
                 print('fifo mode')
                 index = 0
@@ -116,7 +119,12 @@ def receive_message(mode='pos'):
                 fifo_start_move()
             else :
                 print('pos mode')
-                last_angle = message_data[-6:] #倒数6个
+                last_angle = message_data[0][-6:] #倒数6个
+                last_angle[4] = -last_angle[4]
+                last_angle[3] = -last_angle[3]
+                for i in range(6):
+                    plc.write_by_name("MAIN.SetPos["+str(i+1)+"]", last_angle[i])
+                pos_move()
                 print(last_angle)
             
             message_data[0] = None
