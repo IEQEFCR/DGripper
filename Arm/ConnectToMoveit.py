@@ -12,8 +12,9 @@ plc.open()
 
 KAI = '192.168.137.40'
 LEI = '192.168.26.18'
+NUC = '192.168.12.1'
 
-client = roslibpy.Ros(host=KAI, port=9090)
+client = roslibpy.Ros(host=NUC, port=9090)
 
 angle = [0, 0, 0, 0, 0, 0]
 last_angle = [0, 0, 0, 0, 0, 0]
