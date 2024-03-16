@@ -1,5 +1,5 @@
 sensor_id: 1
-calibration_root_dir: .calibration
+calibration_root_dir: ./calibration
 
 camera_setting:
   camera_channel: 2
@@ -29,7 +29,7 @@ depth_calibration:
   Pixel_to_Depth_path: /Pixel_to_Depth.npy
 
 sensor_reconstruction:
-  lighting_threshold: 11
+  lighting_threshold: 5
   kernel_list:
     - 7
     - 7
