@@ -9,6 +9,7 @@ from moveit_msgs.msg import RobotTrajectory
 from moveit_msgs.msg import DisplayTrajectory
 #import nav_msgs/Odometry
 from nav_msgs.msg import Odometry
+import tf
 
 import sys, tty, termios
 fd = sys.stdin.fileno()
@@ -82,17 +83,29 @@ class MoveItIkDemo:
         way_points=[]
         now_pose = PoseStamped()
 
-        now_pose.pose.position.x = 0.313
-        now_pose.pose.position.y = 0
-        now_pose.pose.position.z = 0.625
+        # tf look up between world and link6
+        listener = tf.TransformListener()
+        listener.waitForTransform('world', 'link6', rospy.Time(), rospy.Duration(4.0))
+        link62world = listener.lookupTransform('world', 'link6', rospy.Time(0))
+        gripper2world = listener.lookupTransform('world', 'gripper', rospy.Time(0))
+
+        now_pose.pose.position.x = link62world[0][0]
+        now_pose.pose.position.y = link62world[0][1]
+        now_pose.pose.position.z = link62world[0][2]
         now_pose.pose.orientation.x = 0.707
         now_pose.pose.orientation.y = 0
         now_pose.pose.orientation.z = 0.707
         now_pose.pose.orientation.w = 0
+
         last_time = rospy.get_time()
         single_step = 0.01
+
         while rospy.is_shutdown()==False:
             key = getch()
+            link62world = listener.lookupTransform('world', 'link6', rospy.Time(0))
+            now_pose.pose.position.x = link62world[0][0]
+            now_pose.pose.position.y = link62world[0][1]
+            now_pose.pose.position.z = link62world[0][2]
             if key =='q':
                 break
             if key == 's':
@@ -118,12 +131,10 @@ class MoveItIkDemo:
                 single_step*=2
             elif key =='j':
                 single_step/=2
-                
-            print(single_step)
-            
-            rate.sleep()
+            #clear the screen
 
-            if rospy.get_time()-last_time>0.5:
+            rate.sleep()
+            if rospy.get_time()-last_time>0.5 and len(way_points)>0:
                 (plan, fraction) = arm.compute_cartesian_path(
                     way_points,   # waypoints to follow
                     0.002,        # eef_step
@@ -131,18 +142,14 @@ class MoveItIkDemo:
                 arm.execute(plan)
                 way_points = []
                 last_time = rospy.get_time()
-            # arm.set_start_state_to_current_state()
-            # # 设置机械臂终端运动的目标位姿
-            # arm.set_pose_target(target_pose, end_effector_link)
-            
-            # # 规划运动路径
-            # plan_success, plan, planning_time, error_code = arm.plan()
 
-            # if plan_success:
-            #     print('plan_success')
-            #     arm.execute(plan)
-            # else :
-            #     print('plan_fail')
+            print("\033c")
+            print("single_step:<<<<",single_step,">>>>")
+            link62world = listener.lookupTransform('world', 'link6', rospy.Time(0))
+            gripper2world = listener.lookupTransform('world', 'gripper', rospy.Time(0))
+            print('link62world:',link62world[0])
+            print('gripper2world:',gripper2world[0])
+
 
 if __name__ == "__main__":
     MoveItIkDemo()

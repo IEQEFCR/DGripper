@@ -17,7 +17,6 @@ def callback(data):
             angle_list = []
             for i in data.trajectory[0].joint_trajectory.points:
                 temp = list(i.positions)
-                temp [5] = 0
                 angle_list = np.append(angle_list,temp)
                 # angle_list[-1][-1] = 0
 

@@ -3,3 +3,6 @@ build/
 devel/
 
 .vscode/
+
+#add mp4 file
+*.mp4

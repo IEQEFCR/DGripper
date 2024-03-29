@@ -13,6 +13,8 @@ class Sensor(Camera):
         self.Pixel_to_Depth_path = self.depth_calibration_dir + \
             depth_calibration['Pixel_to_Depth_path']
 
+        self.axis_queue = []
+        self.center_point = []
         if calibrated:
             self.Pixel_to_Depth = np.load(self.Pixel_to_Depth_path)
             self.max_index = len(self.Pixel_to_Depth) - 1
@@ -23,6 +25,18 @@ class Sensor(Camera):
             else:
                 self.ref = ref
             self.ref_GRAY = cv2.cvtColor(self.ref, cv2.COLOR_BGR2GRAY)
+            mask = np.zeros_like(self.ref_GRAY)
+            mask[self.ref_GRAY > 180] = 255
+            mask[self.ref_GRAY < 80] = 255
+            cv2.imshow('mask', mask)
+            self.mask = mask
+            kernel = np.ones((5, 5), np.uint8)
+            mask = cv2.dilate(mask, kernel, iterations=1)
+            self.ref_GRAY = cv2.inpaint(
+                self.ref_GRAY, mask, 7, cv2.INPAINT_TELEA)
+            cv2.imshow('ref_inpaint', self.ref_GRAY)
+            cv2.waitKey(0)
+            cv2.destroyAllWindows()
             sensor_reconstruction = cfg['sensor_reconstruction']
             self.lighting_threshold = sensor_reconstruction['lighting_threshold']
             self.kernel_list = sensor_reconstruction['kernel_list']

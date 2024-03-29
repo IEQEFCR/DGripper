@@ -28,6 +28,10 @@
   <!-- If needed, broadcast static tf for robot root -->
   <node pkg="tf2_ros" type="static_transform_publisher" name="virtual_joint_broadcaster_0" args="0 0 0.085 0 0 -1.57 world base_link" />
 
+  <node pkg="tf2_ros" type="static_transform_publisher" name="virtual_joint_broadcaster_1" args="-0.066 0 0  -0.7071068 0 0.7071068 0 link6 camera" />
+
+  <node pkg="tf2_ros" type="static_transform_publisher" name="virtual_joint_broadcaster_2" args="-0.19 0 0  -0.7071068 0 0.7071068 0 link6 gripper" />
+
   <group if="$(eval arg('moveit_controller_manager') == 'fake')">
     <!-- We do not have a real robot connected, so publish fake joint states via a joint_state_publisher
          MoveIt's fake controller's joint states are considered via the 'source_list' parameter -->

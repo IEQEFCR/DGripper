@@ -29,7 +29,7 @@ depth_calibration:
   Pixel_to_Depth_path: /Pixel_to_Depth.npy
 
 sensor_reconstruction:
-  lighting_threshold: 5
+  lighting_threshold: 8
   kernel_list:
     - 7
     - 7
