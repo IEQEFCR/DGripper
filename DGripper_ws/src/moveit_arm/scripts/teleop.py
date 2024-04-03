@@ -35,12 +35,17 @@ def rot2quet(rot):
 def t265_pose_callback(msg):
     global t265_pose
     t265_pose = msg
-    # print('t265_pose:',t265_pose)
 
-# def send_position(plan):
-#     #transform the postion list in the plan to multi64array
+def teleop_callback(msg):
+    global teleop , received_time
+    received_time = rospy.get_time()
+    teleop = msg.data
 
 t265_pose = Odometry()
+teleop_sub = rospy.Subscriber('/teleop', String, teleop_callback)
+teleop = 'n'
+received_time = None
+
 
 class MoveItIkDemo:
     def __init__ (self):
@@ -49,7 +54,9 @@ class MoveItIkDemo:
 
         # 初始化ROS节点
         rospy.init_node('send_goal')
-        global t265_pose
+        global t265_pose, teleop, received_time
+        received_time = rospy.get_time()
+        rospy.sleep(0.3)
         t265_pose_sub = rospy.Subscriber('/camera/odom/sample', Odometry, t265_pose_callback)
                 
         # 初始化需要使用move group控制的机械臂中的arm group
@@ -99,9 +106,17 @@ class MoveItIkDemo:
 
         last_time = rospy.get_time()
         single_step = 0.01
+        rate = rospy.Rate(30)
 
         while rospy.is_shutdown()==False:
-            key = getch()
+            now_time = rospy.get_time()
+            if now_time - received_time < 0.2:
+                key = teleop[0]
+                print('teleop:',key)
+                teleop = 'n'  
+            else:
+                key = 'n'
+
             link62world = listener.lookupTransform('world', 'link6', rospy.Time(0))
             now_pose.pose.position.x = link62world[0][0]
             now_pose.pose.position.y = link62world[0][1]
@@ -126,6 +141,8 @@ class MoveItIkDemo:
             #elif key is shift:
             elif key == 'c':
                 now_pose.pose.position.z -= single_step
+                if now_pose.pose.position.z < 0.185:
+                    now_pose.pose.position.z = 0.185
                 way_points.append(now_pose.pose)
             elif key =='u':
                 single_step*=2
@@ -147,8 +164,13 @@ class MoveItIkDemo:
             print("single_step:<<<<",single_step,">>>>")
             link62world = listener.lookupTransform('world', 'link6', rospy.Time(0))
             gripper2world = listener.lookupTransform('world', 'gripper', rospy.Time(0))
+            #round the number
+            for i in range(3):
+                link62world[0][i] = round(link62world[0][i],3)
+                gripper2world[0][i] = round(gripper2world[0][i],3)
             print('link62world:',link62world[0])
             print('gripper2world:',gripper2world[0])
+            rate.sleep()
 
 
 if __name__ == "__main__":

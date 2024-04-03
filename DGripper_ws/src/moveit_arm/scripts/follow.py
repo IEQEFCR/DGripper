@@ -2,6 +2,7 @@
 import rospy, sys
 import moveit_commander
 from geometry_msgs.msg import PoseStamped, Pose
+from std_msgs.msg import String
 import numpy as np
 from std_msgs.msg import Float64MultiArray
 from std_msgs.msg import String
@@ -44,12 +45,17 @@ def t265_pose_callback(msg):
 t265_pose = Odometry()
 
 class MoveItIkDemo:
+
+    def teleop_callback(self, msg):
+        self.teleop = msg.data
+
     def __init__ (self):
 
         moveit_commander.roscpp_initialize(sys.argv)
-
+        self.teleop ="n"
         # 初始化ROS节点
         rospy.init_node('follow')
+        rospy.Subscriber('/teleop', String, self.teleop_callback)
         global t265_pose
         t265_pose_sub = rospy.Subscriber('/camera/odom/sample', Odometry, t265_pose_callback)
                 
@@ -106,7 +112,8 @@ class MoveItIkDemo:
         single_step = 0.01
 
         while rospy.is_shutdown()==False:
-            key = getch()
+            key = self.teleop[0]
+            self.teleop = "n"
             object2world = listener.lookupTransform('world', 'object', rospy.Time(0))
             gripper2object = listener.lookupTransform('object', 'gripper', rospy.Time(0))
             link62world = listener.lookupTransform('world', 'link6', rospy.Time(0))
@@ -134,9 +141,22 @@ class MoveItIkDemo:
             print('horizontal_distance:',horizontal_distance)
             
             if key == '1' and horizontal_distance<0.05:
-                now_pose.pose.position.z = 0.19
+                now_pose.pose.position.z = 0.187
                 way_points.append(now_pose.pose)
                 
+            if key == '2':
+                base_pose = (0.3079,0.060,0.1900)
+                now_pose.pose.position.x = base_pose[0]
+                now_pose.pose.position.y = base_pose[1]
+                now_pose.pose.position.z = now_pose.pose.position.z
+                way_points.append(now_pose.pose)
+
+            if key == '3':
+                base_pose = (0.3079,0.060,0.1900)
+                now_pose.pose.position.x = base_pose[0]
+                now_pose.pose.position.y = base_pose[1]
+                now_pose.pose.position.z = 0.25
+                way_points.append(now_pose.pose)
 
             if key == 'q':
                 exit(0)

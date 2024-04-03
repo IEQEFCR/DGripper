@@ -6,6 +6,8 @@ from sensor import Sensor
 from visualizer import Visualizer
 import rospy
 from std_msgs.msg import Float32MultiArray
+from sensor_msgs.msg import Image
+from cv_bridge import CvBridge, CvBridgeError
 
 def tactile_img(sensor,index=1):
     img = sensor.get_rectify_crop_image()
@@ -90,30 +92,26 @@ def tactile_img(sensor,index=1):
     cv2.putText(img, 'dx: '+str(dx), (200, 40), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255, 255, 255), 1, cv2.LINE_AA)
     cv2.putText(img, 'dz: '+str(dz), (200, 60), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255, 255, 255), 1, cv2.LINE_AA)
     # cv2.imshow('raw'+str(index), img)
-    height_map = sensor.expand_image(height_map)
+    height_map = sensor.expand_image(height_map) #扩大图像
 
     # depth_map_video.write(cv2.cvtColor(depth_map, cv2.COLOR_GRAY2BGR))
     #depth_map 转 伪彩色图
     # depth_map = depth_map*1.7
     # depth_map = depth_map.astype(np.uint8)
     # depth_map = cv2.applyColorMap(depth_map, cv2.COLORMAP_MAGMA)
-    return img,dx,dz,depth_sum
+    return img,dx,dz,depth_sum,height_map
 
 if __name__ == '__main__':
-
-    # camera = cv2.VideoCapture(0)
-    # camera.set(cv2.CAP_PROP_FRAME_WIDTH, 640)
-    # camera.set(cv2.CAP_PROP_FRAME_HEIGHT, 480)
-    # ROS pulisher
     rospy.init_node('tactile_node', anonymous=True)
-    rod_pub = rospy.Publisher("/rod_roll", Float32MultiArray, queue_size=10)
+    rod_pub = rospy.Publisher("/rod_rollx", Float32MultiArray, queue_size=10)
+    height_map_pub = rospy.Publisher("/height_map", Image, queue_size=10)
 
     os.chdir(os.path.dirname(os.path.abspath(__file__)))
     f = open("shape_config.yaml", 'r+', encoding='utf-8')
     cfg = yaml.load(f, Loader=yaml.FullLoader)
-    cfg['camera_setting']['camera_channel'] =2
+    cfg['camera_setting']['camera_channel'] =0
     sensor1 = Sensor(cfg)
-    cfg['camera_setting']['camera_channel'] =4
+    cfg['camera_setting']['camera_channel'] =2
     sensor2 = Sensor(cfg)
 
     index = 0
@@ -124,24 +122,22 @@ if __name__ == '__main__':
         os.makedirs(video_path)
     while os.path.exists(video_path+str(index)+'_demo.mp4'):
         index += 1
-    video = cv2.VideoWriter(video_path+str(index)+'_demo.mp4', cv2.VideoWriter_fourcc(*'MJPG'), 25, (460,690)) 
-    
+    video = cv2.VideoWriter(video_path+str(index)+'_demo.mp4', cv2.VideoWriter_fourcc(*'MJPG'), 25, (460,690))     
     start_video = False
+    bridge = CvBridge()
 
     while sensor1.cap.isOpened() and sensor2.cap.isOpened():
-        t1, dx1, dz1, depth_sum1 = tactile_img(sensor1,1)
-        t2 ,dx2, dz2, depth_sum2 = tactile_img(sensor2,2)
+        t1, dx1, dz1, depth_sum1 ,h1= tactile_img(sensor1,1)
+        t2 ,dx2, dz2, depth_sum2 ,h2= tactile_img(sensor2,2)
 
         # publish info get from tactile_img
         msg_data = [2, dz1, dx1, dz2, dx2, depth_sum1, depth_sum2]
         pub_msg = Float32MultiArray(data=msg_data)
         rod_pub.publish(pub_msg)
-
-        # t1 =np.hstack((t1,r1))
-        # t2 =np.hstack((t2,r2))
-        # t1 = np.zeros_like(t2)
-        #h stack t1 and t2
         show_img = np.vstack((t1, t2))
+        height_map = np.vstack((h1, h2))
+        #以float32格式发布
+        height_map_pub.publish(bridge.cv2_to_imgmsg(height_map, "64FC1"))
         #show_img 上下中心画一条线
         cv2.line(show_img, (0,345), (460,345), (255,255,255), 2)
         #put text "Left" and "Right"

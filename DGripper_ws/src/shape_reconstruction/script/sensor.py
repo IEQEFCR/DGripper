@@ -26,7 +26,7 @@ class Sensor(Camera):
                 self.ref = ref
             self.ref_GRAY = cv2.cvtColor(self.ref, cv2.COLOR_BGR2GRAY)
             mask = np.zeros_like(self.ref_GRAY)
-            mask[self.ref_GRAY > 180] = 255
+            mask[self.ref_GRAY > 175] = 255
             mask[self.ref_GRAY < 80] = 255
             cv2.imshow('mask', mask)
             self.mask = mask

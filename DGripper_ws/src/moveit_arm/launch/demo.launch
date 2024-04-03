@@ -73,5 +73,7 @@
   <!-- rosrun remote_arm hear_send.py -->
 <node name="hear_send" pkg="moveit_arm" type="hear_send.py" output="screen" />
 
+<node name="teleop_arm" pkg="moveit_arm" type="teleop.py" output="screen" />
+
 
 </launch>
