@@ -92,7 +92,8 @@ def tactile_img(sensor,index=1):
     cv2.putText(img, 'dx: '+str(dx), (200, 40), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255, 255, 255), 1, cv2.LINE_AA)
     cv2.putText(img, 'dz: '+str(dz), (200, 60), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255, 255, 255), 1, cv2.LINE_AA)
     # cv2.imshow('raw'+str(index), img)
-    height_map = sensor.expand_image(height_map) #扩大图像
+
+    # height_map = sensor.expand_image(height_map) #扩大图像
 
     # depth_map_video.write(cv2.cvtColor(depth_map, cv2.COLOR_GRAY2BGR))
     #depth_map 转 伪彩色图
@@ -135,9 +136,10 @@ if __name__ == '__main__':
         pub_msg = Float32MultiArray(data=msg_data)
         rod_pub.publish(pub_msg)
         show_img = np.vstack((t1, t2))
+
         height_map = np.vstack((h1, h2))
         #以float32格式发布
-        height_map_pub.publish(bridge.cv2_to_imgmsg(height_map, "64FC1"))
+        height_map_pub.publish(bridge.cv2_to_imgmsg(height_map, "32FC1"))
         #show_img 上下中心画一条线
         cv2.line(show_img, (0,345), (460,345), (255,255,255), 2)
         #put text "Left" and "Right"

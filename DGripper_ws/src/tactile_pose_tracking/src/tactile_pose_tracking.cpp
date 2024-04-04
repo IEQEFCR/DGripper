@@ -18,20 +18,26 @@
 
 using namespace std;
 
-#define time_step 0.02
+#define time_step 0.05
 #define history_time 2
 #define feature_num 20
-#define pixmm 0.1
-#define depth_threshold 0.1  // 深度阈值,以mm为单位
-#define point_distance 5     // 特征点之间的像素距离
+#define pixmm 0.051015        // 每个像素对应的物理距离
+#define depth_threshold 0.01  // 深度阈值,以mm为单位
+#define point_distance 8      // 特征点之间的像素距离
 
 class tactile_point {  // 触觉点类
    public:
     double x, y, z;  // 在物理坐标系下的坐标
     double depth;    // 触觉的深度
     int u, v;        // 在像素坐标系下的坐标
-    tactile_point(double x, double y, double z, double depth, int u, int v)
-        : x(x), y(y), z(z), depth(depth), u(u), v(v) {}
+    tactile_point(double x, double y, double z, double depth, int u, int v) {
+        this->x = x;
+        this->y = y;
+        this->z = z;
+        this->depth = depth;
+        this->u = u;
+        this->v = v;
+    }
     tactile_point() {}
 };
 
@@ -45,6 +51,7 @@ class feature {  // 特征点类
     feature(tactile_point p) {
         // list P add p
         this->P.push_back(p);
+        this->last_point = p;
         count = 1;
     }
 
@@ -53,7 +60,7 @@ class feature {  // 特征点类
         if (this->P.size() > feature_num)
             this->P.pop_front();
         count = this->P.size();
-        last_point = p;
+        this->last_point = p;
     }
     // 倒数第n个元素
     tactile_point get_back_point(int n) {
@@ -95,7 +102,6 @@ class angle_tracking {
     list<feature> feature_queue[2];  // 0 for left,1 for right
     // 订阅夹爪状态和触觉高度图
     void gripper_callback(const std_msgs::Float32MultiArray::ConstPtr& msg) {
-        std::cout << "gs" << std::endl;
         gs = gripper_state(msg->data[0], msg->data[1], msg->data[2],
                            msg->data[3], msg->data[4]);
     }
@@ -115,7 +121,6 @@ class angle_tracking {
         tactile_heighmap[1] =
             cv_ptr->image(cv::Rect(0, cv_ptr->image.rows / 2,
                                    cv_ptr->image.cols, cv_ptr->image.rows / 2));
-        printf("receive tactile height map\n");
     }
 
     angle_tracking() {
@@ -131,19 +136,30 @@ class angle_tracking {
     void update(int side, double dz) {  // side 0 is left ,side 1 is right
         // 遍历链表
         for (auto it = feature_queue[side].begin();
-             it != feature_queue[side].end(); it++) {
-            feature f = *it;
-            tactile_point p = f.last_point;
+             it != feature_queue[side].end();) {
+            feature* f = &(*it);
+
+            tactile_point p = f->last_point;
             p.u = p.u + (int)(dz / pixmm);
-            if (p.u < 0 || p.u >= tactile_heighmap[side].cols)
-                feature_queue[side].erase(it);  // delete feature
-            p.depth = tactile_heighmap[side].at<float>(p.v, p.u);
-            if (p.depth < depth_threshold)
-                feature_queue[side].erase(it);  // delete feature
+            std::cout << "dz: " << (int)(dz / pixmm) << std::endl;
+            if (p.u < 0 || p.u >= tactile_heighmap[side].cols) {
+                auto it_temp = it;
+                it++;
+                feature_queue[side].erase(it_temp);
+                continue;
+            }
+            p.depth = tactile_heighmap[side].at<double>(p.v, p.u);
+            if (p.depth < depth_threshold) {
+                auto it_temp = it;
+                it++;
+                feature_queue[side].erase(it_temp);
+                continue;
+            }  // delete feature
             p.z = p.z + dz;
             p.y = p.depth + gs.finger_distance / 2;
             p.y = (side == 0 ? p.y : -p.y);
-            f.add_point(p);
+            f->add_point(p);
+            it++;
         }
     }
 
@@ -192,15 +208,16 @@ class angle_tracking {
                                             CV_8UC1);  // 二值图像
         cv::threshold(tactile_heighmap[side], binary_img, depth_threshold, 255,
                       cv::THRESH_BINARY);  // 大于depth_threshold的像素点为255
-        // find contours
+        binary_img.convertTo(binary_img, CV_8UC1);
+
         // 消除mask中现有点区域
         for (auto it = feature_queue[side].begin();
              it != feature_queue[side].end(); it++) {
             feature f = *it;
-            for (auto p : f.P) {
-                cv::circle(binary_img, cv::Point(p.u, p.v), point_distance,
-                           cv::Scalar(0), -1);
-            }
+            auto p = f.last_point;
+            // print p u,v
+            cv::circle(binary_img, cv::Point(p.u, p.v), point_distance,
+                       cv::Scalar(0), -1);
         }
         // find contours
         std::vector<std::vector<cv::Point>> contours;
@@ -237,10 +254,9 @@ class angle_tracking {
             for (auto it = feature_queue[side].begin();
                  it != feature_queue[side].end(); it++) {
                 feature f = *it;
-                for (auto p : f.P) {
-                    cv::circle(img[side], cv::Point(p.u, p.v), 1,
-                               cv::Scalar(0, 255, 0), -1);
-                }
+                auto p = f.last_point;
+                cv::circle(img[side], cv::Point(p.u, p.v), 2,
+                           cv::Scalar(0, 255, 0), -1);
             }
         }
         cv::imshow("feature0", img[0]);
@@ -249,27 +265,6 @@ class angle_tracking {
     }
 
     void run() {
-        ros::Rate loop_rate(1 / time_step);
-        gripper_state last_gripper_state = gs, now_gripper_state;
-        while (ros::ok()) {
-            loop_rate.sleep();
-            ros::spinOnce();         // 读取夹爪状态和触觉高度图
-            now_gripper_state = gs;  // 读取当前夹爪状态
-            update(0,
-                   now_gripper_state.left_finger_position -  // 更新左指特征
-                       last_gripper_state.left_finger_position);
-            update(1,
-                   now_gripper_state.right_finger_position -  // 更新右指特征
-                       last_gripper_state.right_finger_position);
-            pose_estimation();  // 利用目前更新完成的特征点进行位姿估计
-            add_new_feature(0);  // 添加新的触觉特征
-            add_new_feature(1);
-            show_feature();  // 显示特征点
-            last_gripper_state = now_gripper_state;
-        }
-    }
-
-    void debug() {
         ros::NodeHandle nh;
         ros::Subscriber gripper_sub;
         ros::Subscriber tactile_heighmap_sub;
@@ -280,44 +275,73 @@ class angle_tracking {
                          &angle_tracking::tactile_heighmap_callback, this);
         ros::Rate loop_rate(1 / time_step);
         gripper_state last_gripper_state = gs, now_gripper_state;
+
         while (ros::ok()) {
             loop_rate.sleep();
             ros::spinOnce();         // 读取夹爪状态和触觉高度图
             now_gripper_state = gs;  // 读取当前夹爪状态
-            // print tactile heighmap size
-            // print the size of the tactile heighmap
-            std::cout << tactile_heighmap[0].size().width << std::endl;
-            if (tactile_heighmap[0].size().width == 0) {
+            if (tactile_heighmap[0].size().width == 0)
                 continue;
-            }
-            // 创建一张全白灰度图 640 x480
-            cv::Mat binary_img[2] = {
-                cv::Mat::zeros(tactile_heighmap[0].size(), CV_8UC1),
-                cv::Mat::zeros(tactile_heighmap[1].size(), CV_8UC1)};
-            cv::threshold(tactile_heighmap[0], binary_img[0], depth_threshold,
-                          255, cv::THRESH_BINARY);
-            cv::threshold(tactile_heighmap[1], binary_img[1], depth_threshold,
-                          255, cv::THRESH_BINARY);
-            cv::imshow("t2", binary_img[1]);
-            cv::imshow("t1", binary_img[0]);
 
-            cv::waitKey(1);
-            // print the gripper state
-            std::cout << "left_finger_position: "
-                      << now_gripper_state.left_finger_position << std::endl;
-            std::cout << "right_finger_position: "
-                      << now_gripper_state.right_finger_position << std::endl;
+            update(1,
+                   now_gripper_state.left_finger_position -  // 更新左指特征
+                       last_gripper_state.left_finger_position);
+            update(0,
+                   now_gripper_state.right_finger_position -  // 更新右指特征
+                       last_gripper_state.right_finger_position);
+            // pose_estimation();  // 利用目前更新完成的特征点进行位姿估计
+
+            add_new_feature(0);  // 添加新的触觉特征
+            add_new_feature(1);
+            show_feature();  // 显示特征点
+            last_gripper_state = now_gripper_state;
         }
     }
+
+    //     void debug() {
+    //         ros::NodeHandle nh;
+    //         ros::Subscriber gripper_sub;
+    //         ros::Subscriber tactile_heighmap_sub;
+    //         gripper_sub = nh.subscribe("/motors_pos_real", 1,  //
+    //         订阅夹爪状态
+    //                                    &angle_tracking::gripper_callback,
+    //                                    this);
+    //         tactile_heighmap_sub =
+    //             nh.subscribe("/height_map", 1,  // 订阅触觉高度图
+    //                          &angle_tracking::tactile_heighmap_callback,
+    //                          this);
+    //         ros::Rate loop_rate(1 / time_step);
+    //         gripper_state last_gripper_state = gs, now_gripper_state;
+    //         while (ros::ok()) {
+    //             loop_rate.sleep();
+    //             ros::spinOnce();         // 读取夹爪状态和触觉高度图
+    //             now_gripper_state = gs;  // 读取当前夹爪状态
+
+    //             if (tactile_heighmap[0].size().width == 0) {
+    //                 continue;
+    //             }
+    //             add_new_feature(0);  // 添加新的触觉特征
+    //             add_new_feature(1);
+    //             // print feature_list
+    //             for (int side = 0; side < 2; side++) {
+    //                 for (auto it = feature_queue[side].begin();
+    //                      it != feature_queue[side].end(); it++) {
+    //                     feature f = *it;
+    //                     tactile_point p = f.last_point;
+    //                     // print p u v
+    //                     std::cout << p.u << " " << p.v << std::endl;
+    //                 }
+    //             }
+    //             show_feature();  // 显示特征点
+    //             cv::waitKey(1);
+    //         }
+    //     }
 };
 
 int main(int argc, char** argv) {
     ros::init(argc, argv, "tactile_pose_tracking");
-    cv::namedWindow("t1", cv::WINDOW_NORMAL);
-    cv::namedWindow("t2", cv::WINDOW_NORMAL);
-    // cv::namedWindow("t2", cv::WINDOW_NORMAL);
     angle_tracking at;
-    at.debug();
+    at.run();
     return 0;
 }
 

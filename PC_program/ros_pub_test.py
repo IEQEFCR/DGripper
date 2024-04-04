@@ -10,7 +10,7 @@ if __name__ == '__main__':
     pub = rospy.Publisher("/motor_pos_tar", Float32MultiArray, queue_size=10)
     sub = rospy.Subscriber("/motors_pos_real", Float32MultiArray, callback)
     #4.组织被发布的数据
-    raw_msg = [0, 0, 35, 0, 0, 0, 0, 0]
+    raw_msg = [-50, 50, 15, 0, 0, 0, 0, 0]
     msg = Float32MultiArray(data = raw_msg)
     # 设置循环频率
     rate = rospy.Rate(1)
